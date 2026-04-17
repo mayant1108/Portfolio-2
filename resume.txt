@@ -1,0 +1,23 @@
+Mayant Khanna
+Full-Stack Web Developer
+
+Summary
+Entry-level Full Stack Developer with hands-on experience in React.js, Node.js, Express.js, and MongoDB. Strong understanding of web development, REST APIs, problem solving, and competitive programming.
+
+Core Skills
+HTML, CSS, Tailwind, Bootstrap, React, Node.js, Express, MongoDB, VS Code, Git, GitHub, Postman, JavaScript, C++
+
+Education
+Bachelor of Computer Application
+Manipal University Jaipur
+2024 - 2027
+
+Contact
+Location: Alwar, Rajasthan
+Phone: +91-8440031328
+Email: mayant.tipsgalwar@gmail.com
+LinkedIn: linkedin.com/in/mayant-khanna
+GitHub: github.com/mayant1108
+
+Career Goal
+Build modern web applications across frontend and backend development while growing as a dependable full-stack developer.

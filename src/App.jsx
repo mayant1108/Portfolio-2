@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
 import About from "./components/About.jsx";
 import Contact from "./components/Contact.jsx";
 import Footer from "./components/Footer.jsx";
@@ -49,6 +50,26 @@ export default function App() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className:
+            "rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-900 shadow-soft dark:border-white/10 dark:bg-slate-900 dark:text-white",
+          duration: 4200,
+          success: {
+            iconTheme: {
+              primary: "#14b8a6",
+              secondary: "#ffffff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#f97316",
+              secondary: "#ffffff",
+            },
+          },
+        }}
+      />
       <Navbar
         activeSection={activeSection}
         theme={theme}

@@ -104,7 +104,8 @@ export default function Hero() {
               src={profile.image}
               alt={`${profile.name} profile photo`}
               className="aspect-square w-full rounded-full object-cover transition duration-700 group-hover:scale-110"
-              fetchPriority="high"
+              decoding="async"
+              loading="eager"
             />
           </div>
           <div className="absolute -left-2 bottom-10 rounded-lg border border-slate-200 bg-white/80 px-4 py-3 shadow-soft backdrop-blur-xl dark:border-white/15 dark:bg-slate-950/70 sm:left-0">

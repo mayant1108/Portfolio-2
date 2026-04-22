@@ -4,6 +4,12 @@ import { profile } from "../data/portfolio.js";
 const whatsappNumber = profile.phone.replace(/\D/g, "");
 const whatsappMessage = "Hi Mayant, I saw your portfolio and would like to connect.";
 
+const emailJsDirectConfig = {
+  serviceId: "service_x6y7syq",
+  templateId: "template_yztni4r",
+  publicKey: "POUIfdTlwXpWk0Hib",
+};
+
 export const emailJsEnvKeys = {
   serviceId: "VITE_EMAILJS_SERVICE_ID",
   templateId: "VITE_EMAILJS_TEMPLATE_ID",
@@ -15,15 +21,28 @@ const placeholderValues = new Set([
   "service_xxxxxxx",
   "template_xxxxxxx",
   "your_public_key",
-  "your_service_id",
-  "your_template_id",
 ]);
 
+function resolveEmailJsValue(envValue, fallbackValue) {
+  const normalizedEnvValue = envValue?.trim() || "";
+  return placeholderValues.has(normalizedEnvValue) ? fallbackValue : normalizedEnvValue;
+}
+
 // Vite only exposes frontend environment variables that start with `VITE_`.
+// If env values are blank or still placeholders, use the config provided here.
 export const emailJsConfig = {
-  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID?.trim() || "",
-  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID?.trim() || "",
-  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY?.trim() || "",
+  serviceId: resolveEmailJsValue(
+    import.meta.env.VITE_EMAILJS_SERVICE_ID,
+    emailJsDirectConfig.serviceId,
+  ),
+  templateId: resolveEmailJsValue(
+    import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+    emailJsDirectConfig.templateId,
+  ),
+  publicKey: resolveEmailJsValue(
+    import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+    emailJsDirectConfig.publicKey,
+  ),
 };
 
 export const emailJsTemplateFields = {
@@ -35,7 +54,7 @@ export const emailJsTemplateFields = {
 
 export function getMissingEmailJsEnvKeys() {
   return Object.entries(emailJsConfig)
-    .filter(([, value]) => placeholderValues.has(value))
+    .filter(([, value]) => !value)
     .map(([key]) => emailJsEnvKeys[key]);
 }
 

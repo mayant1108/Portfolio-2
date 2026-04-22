@@ -25,14 +25,6 @@ const inputClasses =
 let hasInitializedEmailJs = false;
 let hasLoggedMissingEmailJsEnv = false;
 
-function getEmailJsTemplateParams(form) {
-  return {
-    [emailJsTemplateFields.fromName]: form.name.trim(),
-    [emailJsTemplateFields.fromEmail]: form.email.trim(),
-    [emailJsTemplateFields.replyTo]: form.email.trim(),
-    [emailJsTemplateFields.message]: form.message.trim(),
-  };
-}
 
 function logMissingEmailJsEnv(missingEnvKeys) {
   if (hasLoggedMissingEmailJsEnv) {
@@ -43,7 +35,7 @@ function logMissingEmailJsEnv(missingEnvKeys) {
   console.error(
     `[EmailJS] Missing or placeholder Vite environment variable(s): ${missingEnvKeys.join(
       ", ",
-    )}. Add real EmailJS values to .env.local in the project root, then restart the Vite dev server.`,
+    )}. Add real EmailJS values to .env.local or src/config/contact.js, then restart the Vite dev server if needed.`,
   );
 }
 
@@ -55,7 +47,7 @@ function initializeEmailJs({ logMissingEnv = true } = {}) {
       logMissingEmailJsEnv(missingEnvKeys);
     }
 
-    return false;
+    return { ok: false, missingEnvKeys };
   }
 
   if (!hasInitializedEmailJs) {
@@ -65,7 +57,7 @@ function initializeEmailJs({ logMissingEnv = true } = {}) {
     hasInitializedEmailJs = true;
   }
 
-  return true;
+  return { ok: true, missingEnvKeys: [] };
 }
 
 export default function ContactForm() {
@@ -73,57 +65,62 @@ export default function ContactForm() {
   const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
-    initializeEmailJs({ logMissingEnv: false });
+    initializeEmailJs();
   }, []);
 
-  const handleChange = (event) => {
+  function handleChange(event) {
     const { name, value } = event.target;
-    setForm((current) => ({ ...current, [name]: value }));
-  };
+    setForm((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
+  }
 
-  const handleSubmit = async (event) => {
+  async function sendEmail(event) {
     event.preventDefault();
 
-    if (!initializeEmailJs()) {
-      toast.error("Message failed to send. Please try again.");
+    const { ok } = initializeEmailJs();
+
+    if (!ok) {
+      toast.error("Email service is not configured yet.");
       return;
     }
 
     setIsSending(true);
 
     try {
-      const templateParams = getEmailJsTemplateParams(form);
-
-      // Match these keys with the variables in your EmailJS template.
-      const result = await emailjs.send(
+      await emailjs.send(
         emailJsConfig.serviceId,
         emailJsConfig.templateId,
-        templateParams,
-      );
+        {
+          name: form.name,
+          email: form.email,
+          reply_to: form.email,
+          message: form.message,
+        }, emailJsConfig.publicKey);
 
-      if (result.status !== 200) {
-        throw result;
-      }
-
-      toast.success("Message sent successfully!");
+      toast.success("Message sent successfully.");
       setForm(initialForm);
     } catch (error) {
-      console.error("[EmailJS] Failed to send contact form message:", error);
-      toast.error("Message failed to send. Please try again.");
+      console.error("[EmailJS] Failed to send message.", error);
+      toast.error("Unable to send the message right now.");
     } finally {
       setIsSending(false);
     }
-  };
+  }
 
   return (
     <form
       className="rounded-lg border border-slate-200 bg-white p-6 shadow-soft transition-colors duration-300 dark:border-white/10 dark:bg-white/[0.06] dark:backdrop-blur-xl sm:p-8"
-      onSubmit={handleSubmit}
+      onSubmit={sendEmail}
     >
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
-            <HiOutlineUser className="h-4 w-4 text-teal-500 dark:text-teal-300" aria-hidden="true" />
+            <HiOutlineUser
+              aria-hidden="true"
+              className="h-4 w-4 text-teal-500 dark:text-teal-300"
+            />
             Name
           </span>
           <input
@@ -141,8 +138,8 @@ export default function ContactForm() {
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
             <HiOutlineEnvelope
-              className="h-4 w-4 text-teal-500 dark:text-teal-300"
               aria-hidden="true"
+              className="h-4 w-4 text-teal-500 dark:text-teal-300"
             />
             Email
           </span>
@@ -162,8 +159,8 @@ export default function ContactForm() {
       <label className="mt-5 block">
         <span className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
           <HiOutlineChatBubbleBottomCenterText
-            className="h-4 w-4 text-teal-500 dark:text-teal-300"
             aria-hidden="true"
+            className="h-4 w-4 text-teal-500 dark:text-teal-300"
           />
           Message
         </span>
@@ -185,8 +182,8 @@ export default function ContactForm() {
       >
         {isSending ? "Sending..." : "Send Message"}
         <HiOutlinePaperAirplane
-          className={`h-4 w-4 ${isSending ? "animate-pulse" : ""}`}
           aria-hidden="true"
+          className={`h-4 w-4 ${isSending ? "animate-pulse" : ""}`}
         />
       </button>
     </form>

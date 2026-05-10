@@ -46,3 +46,4 @@ Edit `src/data/portfolio.js` to change the name, intro, skills, projects, contac
 Edit `src/config/contact.js` to change the WhatsApp opening message or contact action buttons.
 
 Replace `src/assets/profile-photo-optimized.jpg` with Mayant's uploaded profile photo using the same filename, or update the import in `src/data/portfolio.js`.
+# MY-Portfolio-2
